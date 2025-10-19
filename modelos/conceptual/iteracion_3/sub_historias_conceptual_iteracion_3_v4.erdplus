@@ -2435,35 +2435,6 @@
         "dragging": false
       },
       {
-        "id": "66f84907-5d4a-41e8-a417-c9a66885a0bf",
-        "type": "Relationship",
-        "position": {
-          "x": -274.91386759337655,
-          "y": 413.1382312791229
-        },
-        "data": {
-          "label": "gestiona",
-          "sourceEntityDetails": {
-            "id": "1a20481c-2e63-42d0-a61b-2eb770988483",
-            "minCardinality": "Mandatory",
-            "maxCardinality": "Many"
-          },
-          "targetEntityDetails": {
-            "id": "42a70b33-ba12-45bc-804a-c0e386f5a912",
-            "minCardinality": "Mandatory",
-            "maxCardinality": "One"
-          },
-          "isSelected": false,
-          "isConnectable": true
-        },
-        "measured": {
-          "width": 100,
-          "height": 50
-        },
-        "selected": false,
-        "dragging": false
-      },
-      {
         "id": "33021dd9-fb7e-4d30-afdc-5ff858f3e209",
         "type": "Entity",
         "position": {
@@ -2479,7 +2450,8 @@
         "measured": {
           "width": 100,
           "height": 50
-        }
+        },
+        "selected": false
       },
       {
         "id": "73eb03c6-7e03-4cea-9637-d4249a0765b7",
@@ -3514,28 +3486,6 @@
         }
       },
       {
-        "id": "66f84907-5d4a-41e8-a417-c9a66885a0bf->1a20481c-2e63-42d0-a61b-2eb770988483;1a20481c-2e63-42d0-a61b-2eb770988483->42a70b33-ba12-45bc-804a-c0e386f5a912",
-        "type": "Relationship",
-        "source": "66f84907-5d4a-41e8-a417-c9a66885a0bf",
-        "target": "1a20481c-2e63-42d0-a61b-2eb770988483",
-        "data": {
-          "id": "66f84907-5d4a-41e8-a417-c9a66885a0bf->1a20481c-2e63-42d0-a61b-2eb770988483",
-          "minCardinality": "Mandatory",
-          "maxCardinality": "Many"
-        }
-      },
-      {
-        "id": "66f84907-5d4a-41e8-a417-c9a66885a0bf->42a70b33-ba12-45bc-804a-c0e386f5a912;1a20481c-2e63-42d0-a61b-2eb770988483->42a70b33-ba12-45bc-804a-c0e386f5a912",
-        "type": "Relationship",
-        "source": "66f84907-5d4a-41e8-a417-c9a66885a0bf",
-        "target": "42a70b33-ba12-45bc-804a-c0e386f5a912",
-        "data": {
-          "id": "66f84907-5d4a-41e8-a417-c9a66885a0bf->42a70b33-ba12-45bc-804a-c0e386f5a912",
-          "minCardinality": "Mandatory",
-          "maxCardinality": "One"
-        }
-      },
-      {
         "id": "6fe03bd8-1cf5-4c49-87c2-6049d1492d06",
         "type": "Attribute",
         "source": "33021dd9-fb7e-4d30-afdc-5ff858f3e209",
@@ -3571,9 +3521,9 @@
       }
     ],
     "viewport": {
-      "x": 651.2654532239443,
-      "y": 136.22784370267402,
-      "zoom": 0.5
+      "x": 563.5132381625766,
+      "y": 133.9595036709241,
+      "zoom": 0.5000000000000001
     }
   },
   "name": "sub_historias_conceptual_iteracion_3",
@@ -3584,5 +3534,5 @@
     "id": 50640
   },
   "id": 112788,
-  "updatedAtTimestamp": 1760846810
+  "updatedAtTimestamp": 1760854979
 }
