@@ -1,0 +1,419 @@
+<html><head><style>body {
+   color: black;
+}
+</style></head><body><h1 id="integridad-referencial-y-restricciones-sem-nticas">INTEGRIDAD REFERENCIAL Y RESTRICCIONES SEMÁNTICAS</h1>
+<h2 id="modelo-l-gico-bici-go-v4-0-rol-dise-ador-l-gico">Modelo Lógico BICI-GO v4.0 – Rol: Diseñador Lógico</h2>
+<hr>
+<h3 id="-parte-1-unicidad">🧱 PARTE 1. UNICIDAD</h3>
+<p>En esta sección se definen las restricciones de <strong>unicidad y claves</strong> aplicables al modelo lógico.<br>Estas reglas garantizan la integridad estructural y evitan la duplicidad de registros en las entidades principales.  </p>
+<p><br></p>
+<table>
+<tr><th>Tabla</th><th>Campo(s)</th><th>Restricción</th><th>Prioridad</th><th>Descripción</th></tr>
+
+<tr>
+<td><b>pais</b></td>
+<td>nombre</td>
+<td>UNIQUE</td>
+<td>🟢</td>
+<td>Cada país se registra una única vez, evitando la duplicación de nombres en la tabla <b>pais</b>.</td>
+</tr>
+
+<tr>
+<td><b>ciudad</b></td>
+<td>(nombre, id_pais)</td>
+<td>UNIQUE</td>
+<td>🟢</td>
+<td>El nombre de una ciudad no puede repetirse dentro del mismo país. Sin embargo, puede existir en diferentes países.</td>
+</tr>
+
+<tr>
+<td><b>punto_alquiler</b></td>
+<td>nombre</td>
+<td>UNIQUE</td>
+<td>🟡</td>
+<td>Garantiza que cada punto de alquiler tenga un nombre único en el sistema BICI-GO.</td>
+</tr>
+
+<tr>
+<td><b>usuario</b></td>
+<td>correo</td>
+<td>UNIQUE</td>
+<td>🔴</td>
+<td>El correo electrónico es el identificador único de cada usuario registrado.</td>
+</tr>
+
+<tr>
+<td><b>empleado</b></td>
+<td>documento_identidad</td>
+<td>UNIQUE</td>
+<td>🔴</td>
+<td>Evita la duplicidad de empleados mediante su número de documento.</td>
+</tr>
+
+<tr>
+<td><b>bicicleta</b></td>
+<td>serial_unico</td>
+<td>UNIQUE</td>
+<td>🔴</td>
+<td>Cada bicicleta posee un número de serie único que la identifica físicamente en el sistema.</td>
+</tr>
+
+<tr>
+<td><b>capacidad_tipo</b></td>
+<td>nombre</td>
+<td>UNIQUE</td>
+<td>🟢</td>
+<td>Define un único nombre para cada tipo de capacidad (por ejemplo, “Estacionamiento”, “Taller”, “Cargador eléctrico”).</td>
+</tr>
+
+<tr>
+<td><b>punto_servicio</b></td>
+<td>(nombre, id_punto_alquiler)</td>
+<td>UNIQUE</td>
+<td>🟡</td>
+<td>Permite identificar de forma exclusiva cada tipo de servicio dentro de un punto de alquiler específico.</td>
+</tr>
+
+<tr>
+<td><b>horario_base</b></td>
+<td>nombre</td>
+<td>UNIQUE</td>
+<td>🟢</td>
+<td>Establece que cada horario base registrado tenga un nombre único para facilitar su reutilización en diferentes puntos o servicios.</td>
+</tr>
+
+</table>
+
+<hr>
+<h3 id="-parte-2-integridad-referencial">🔗 PARTE 2. INTEGRIDAD REFERENCIAL</h3>
+<p>En esta sección se describen las <strong>relaciones entre tablas</strong> mediante llaves foráneas, con el fin de mantener la coherencia de los datos a lo largo del modelo lógico.  </p>
+<p>Cada relación define la cardinalidad y las reglas de actualización o eliminación asociadas.</p>
+<p><br></p>
+<table>
+<tr><th>Tabla origen</th><th>Campo FK</th><th>Tabla destino</th><th>Regla</th><th>Prioridad</th><th>Descripción</th></tr>
+
+<tr>
+<td><b>ciudad</b></td>
+<td>id_pais</td>
+<td>pais</td>
+<td>ON DELETE RESTRICT</td>
+<td>🟢</td>
+<td>Una ciudad no puede existir sin un país asociado. No se permite eliminar un país con ciudades activas.</td>
+</tr>
+
+<tr>
+<td><b>punto_alquiler</b></td>
+<td>id_ciudad</td>
+<td>ciudad</td>
+<td>ON DELETE CASCADE</td>
+<td>🟡</td>
+<td>Si una ciudad es eliminada, se eliminan también sus puntos de alquiler asociados.</td>
+</tr>
+
+<tr>
+<td><b>punto_servicio</b></td>
+<td>id_punto_alquiler</td>
+<td>punto_alquiler</td>
+<td>ON DELETE CASCADE</td>
+<td>🟡</td>
+<td>Elimina los servicios asociados al punto si este se elimina.</td>
+</tr>
+
+<tr>
+<td><b>capacidad</b></td>
+<td>id_punto_servicio</td>
+<td>punto_servicio</td>
+<td>ON DELETE CASCADE</td>
+<td>🟢</td>
+<td>La capacidad está directamente vinculada al servicio dentro del punto. Si el servicio se borra, la capacidad también.</td>
+</tr>
+
+<tr>
+<td><b>capacidad</b></td>
+<td>id_capacidad_tipo</td>
+<td>capacidad_tipo</td>
+<td>ON DELETE RESTRICT</td>
+<td>🟢</td>
+<td>No puede eliminarse un tipo de capacidad si existen registros de capacidad que lo referencien.</td>
+</tr>
+
+<tr>
+<td><b>bicicleta</b></td>
+<td>id_punto_alquiler_actual</td>
+<td>punto_alquiler</td>
+<td>ON DELETE SET NULL</td>
+<td>🟡</td>
+<td>Permite que una bicicleta quede “sin punto asignado” si su punto actual es eliminado (en mantenimiento o traslado).</td>
+</tr>
+
+<tr>
+<td><b>empleado</b></td>
+<td>id_punto_alquiler</td>
+<td>punto_alquiler</td>
+<td>ON DELETE SET NULL</td>
+<td>🟡</td>
+<td>Si el punto donde trabaja un empleado es eliminado, su referencia se anula, pero el registro del empleado se conserva.</td>
+</tr>
+
+<tr>
+<td><b>alquiler</b></td>
+<td>(id_usuario, id_bicicleta, id_punto_origen, id_punto_destino)</td>
+<td>usuario, bicicleta, punto_alquiler</td>
+<td>ON DELETE RESTRICT</td>
+<td>🔴</td>
+<td>Garantiza la integridad de los datos de cada alquiler: usuario, bicicleta y puntos deben existir.</td>
+</tr>
+
+<tr>
+<td><b>detalle_dia_horario</b></td>
+<td>id_horario_base</td>
+<td>horario_base</td>
+<td>ON DELETE CASCADE</td>
+<td>🟢</td>
+<td>Si se elimina un horario base, se eliminan todos los detalles de días asociados a él.</td>
+</tr>
+
+<tr>
+<td><b>excepcion_horario</b></td>
+<td>id_horario_base</td>
+<td>horario_base</td>
+<td>ON DELETE CASCADE</td>
+<td>🟢</td>
+<td>Controla excepciones de horarios (festivos o cierres especiales) asociadas a un horario base determinado.</td>
+</tr>
+
+<tr>
+<td><b>mantenimiento</b></td>
+<td>(id_empleado, id_bicicleta)</td>
+<td>empleado, bicicleta</td>
+<td>ON DELETE RESTRICT</td>
+<td>🔴</td>
+<td>Impide eliminar empleados o bicicletas con mantenimientos registrados en el historial.</td>
+</tr>
+
+</table>
+
+<hr>
+<h3 id="-parte-3-integridad-sem-ntica-general">⚙️ PARTE 3. INTEGRIDAD SEMÁNTICA GENERAL</h3>
+<p>Las restricciones semánticas complementan la integridad estructural mediante <strong>reglas de negocio</strong> expresadas sobre los valores permitidos en los atributos.<br>Estas reglas reflejan el comportamiento operativo y los límites válidos de los datos.</p>
+<p><br></p>
+<table>
+<tr><th>Tabla</th><th>Campo(s)</th><th>Condición</th><th>Prioridad</th><th>Descripción</th></tr>
+
+<tr>
+<td><b>usuario</b></td>
+<td>edad</td>
+<td>&gt;= 14</td>
+<td>🔴</td>
+<td>Los usuarios deben tener al menos 14 años para registrarse en el sistema de alquiler BICI-GO.</td>
+</tr>
+
+<tr>
+<td><b>bicicleta</b></td>
+<td>estado</td>
+<td>IN (‘disponible’, ‘en uso’, ‘en mantenimiento’, ‘retirada’)</td>
+<td>🔴</td>
+<td>El estado de la bicicleta debe estar dentro de los valores controlados establecidos por el sistema.</td>
+</tr>
+
+<tr>
+<td><b>punto_alquiler</b></td>
+<td>capacidad_total</td>
+<td>&gt;= 0</td>
+<td>🟢</td>
+<td>Evita valores negativos en la capacidad total de bicicletas que puede manejar un punto de alquiler.</td>
+</tr>
+
+<tr>
+<td><b>capacidad</b></td>
+<td>cantidad_disponible</td>
+<td>&gt;= 0 AND cantidad_disponible &lt;= cantidad_maxima</td>
+<td>🔴</td>
+<td>Garantiza que las unidades disponibles no excedan la capacidad máxima asignada para el servicio o tipo de espacio.</td>
+</tr>
+
+<tr>
+<td><b>horario_base</b></td>
+<td>hora_inicio, hora_fin</td>
+<td>hora_inicio &lt; hora_fin</td>
+<td>🟢</td>
+<td>Verifica que la hora de inicio sea anterior a la hora de fin para mantener coherencia temporal.</td>
+</tr>
+
+<tr>
+<td><b>detalle_dia_horario</b></td>
+<td>dia_semana</td>
+<td>IN (1–7)</td>
+<td>🟢</td>
+<td>Solo se permiten valores de 1 a 7, representando los días de lunes a domingo.</td>
+</tr>
+
+<tr>
+<td><b>excepcion_horario</b></td>
+<td>fecha_excepcion</td>
+<td>UNIQUE por horario_base</td>
+<td>🟡</td>
+<td>No pueden existir dos excepciones para la misma fecha dentro de un mismo horario base.</td>
+</tr>
+
+<tr>
+<td><b>mantenimiento</b></td>
+<td>fecha_fin</td>
+<td>NULL o fecha_fin &gt;= fecha_inicio</td>
+<td>🟢</td>
+<td>La fecha de finalización debe ser posterior o igual a la fecha de inicio. Puede ser nula mientras el mantenimiento esté en curso.</td>
+</tr>
+
+</table>
+
+<hr>
+<h3 id="-parte-4-reglas-de-negocio">🧮 PARTE 4. REGLAS DE NEGOCIO</h3>
+<p>Estas reglas complementan la integridad semántica y expresan la <strong>lógica funcional</strong> del sistema BICI-GO,<br>asegurando que los procesos de registro, alquiler, mantenimiento y operación cumplan los criterios establecidos.</p>
+<p><br></p>
+<table>
+<tr><th>ID Regla</th><th>Nombre</th><th>Condición / Descripción</th><th>Impacto</th><th>Prioridad</th></tr>
+
+<tr>
+<td>RN-01</td>
+<td>Disponibilidad de bicicleta</td>
+<td>Una bicicleta solo puede alquilarse si su estado = &#39;disponible&#39; y se encuentra asociada a un punto de alquiler activo.</td>
+<td>Control de flujo de alquileres</td>
+<td>🔴</td>
+</tr>
+
+<tr>
+<td>RN-02</td>
+<td>Verificación de capacidad</td>
+<td>Antes de permitir el registro de un nuevo alquiler o devolución, debe verificarse que la capacidad del punto de destino sea &gt; 0.</td>
+<td>Previene saturación de puntos</td>
+<td>🔴</td>
+</tr>
+
+<tr>
+<td>RN-03</td>
+<td>Restricción por horario</td>
+<td>No se permite iniciar ni finalizar alquileres fuera del horario operativo definido en <b>detalle_dia_horario</b>.</td>
+<td>Control operacional</td>
+<td>🟡</td>
+</tr>
+
+<tr>
+<td>RN-04</td>
+<td>Mantenimiento preventivo</td>
+<td>Si los valores de <b>uso_acumulado</b> (km o horas) superan el umbral de <b>parametro_mantenimiento</b>, la bicicleta pasa automáticamente a estado = ‘en mantenimiento’.</td>
+<td>Seguridad y durabilidad</td>
+<td>🔴</td>
+</tr>
+
+<tr>
+<td>RN-05</td>
+<td>Asignación de etiquetas</td>
+<td>Una bicicleta puede tener múltiples etiquetas activas, pero no se pueden duplicar combinaciones de (id_bicicleta, id_etiqueta, fecha_asignacion).</td>
+<td>Consistencia informativa</td>
+<td>🟢</td>
+</tr>
+
+<tr>
+<td>RN-06</td>
+<td>Tarifa vigente</td>
+<td>Solo puede existir una tarifa activa (fecha_fin IS NULL) por combinación de <b>id_plan</b> y <b>id_bicicleta</b>.</td>
+<td>Control de precios</td>
+<td>🔴</td>
+</tr>
+
+<tr>
+<td>RN-07</td>
+<td>Seguro activo</td>
+<td>Una bicicleta puede tener varias coberturas, pero solo una por tipo con estado = ‘activo’.</td>
+<td>Gestión de seguros</td>
+<td>🟡</td>
+</tr>
+
+<tr>
+<td>RN-08</td>
+<td>Registro de administrador</td>
+<td>Todo registro de modificación (insert/update/delete) debe asociarse a un <b>id_admin</b> válido en el sistema.</td>
+<td>Trazabilidad de acciones</td>
+<td>🔴</td>
+</tr>
+
+<tr>
+<td>RN-09</td>
+<td>Vigencia de horarios</td>
+<td>Las excepciones o horarios especiales no pueden solaparse con el horario base en las mismas fechas.</td>
+<td>Control temporal</td>
+<td>🟢</td>
+</tr>
+
+<tr>
+<td>RN-10</td>
+<td>Control de integridad física</td>
+<td>El estado físico (‘dañada’, ‘en revisión’, etc.) debe actualizarse cada vez que una bicicleta cambia de estado operativo.</td>
+<td>Gestión técnica</td>
+<td>🟡</td>
+</tr>
+
+</table>
+
+<hr>
+<h3 id="-parte-5-seguridad-l-gica">🔒 PARTE 5. SEGURIDAD LÓGICA</h3>
+<p>Estas restricciones establecen el control de acceso y acciones permitidas por tipo de usuario o rol dentro del sistema.</p>
+<p><br></p>
+<table>
+<tr><th>Rol</th><th>Permisos principales</th><th>Restricciones</th><th>Observaciones</th></tr>
+
+<tr>
+<td><b>Administrador</b></td>
+<td>Insert, Update, Delete, Select</td>
+<td>Ninguna</td>
+<td>Control total sobre todas las entidades, responsable de trazabilidad (<b>id_admin</b>).</td>
+</tr>
+
+<tr>
+<td><b>Operador</b></td>
+<td>Insert, Update, Select</td>
+<td>No puede eliminar registros críticos (bicicleta, plan, tarifa).</td>
+<td>Gestiona alquileres, mantenimiento y disponibilidad en puntos de alquiler.</td>
+</tr>
+
+<tr>
+<td><b>Usuario</b></td>
+<td>Select, Insert</td>
+<td>No puede modificar ni eliminar datos maestros.</td>
+<td>Solo puede iniciar alquileres, consultar planes y registrar devoluciones.</td>
+</tr>
+
+<tr>
+<td><b>Técnico de mantenimiento</b></td>
+<td>Insert, Update</td>
+<td>No puede modificar datos de usuarios ni de tarifas.</td>
+<td>Se limita a registrar mantenimientos y estados operativos o físicos.</td>
+</tr>
+
+<tr>
+<td><b>Auditor</b></td>
+<td>Select</td>
+<td>No puede modificar datos.</td>
+<td>Accede a vistas consolidadas del sistema para control de gestión y trazabilidad.</td>
+</tr>
+
+</table>
+
+<hr>
+<h3 id="-parte-6-observaciones-finales">🧾 PARTE 6. OBSERVACIONES FINALES</h3>
+<ol>
+<li>Todas las entidades que incluyen el campo <strong><code>id_admin</code></strong> deben mantener una relación de trazabilidad con el administrador responsable de la acción.  </li>
+<li>Los campos de tipo <strong>fecha</strong> y <strong>hora</strong> utilizan la convención <strong>UTC-5 (Bogotá)</strong>, y los valores por defecto siguen los registros del servidor.  </li>
+<li>Los <strong>campos de auditoría</strong> (<code>fecha_creacion</code>, <code>fecha_actualizacion</code>, <code>fecha_inicio</code>, <code>fecha_fin</code>) son obligatorios para entidades de tipo histórico o de control.  </li>
+<li>El sistema debe soportar <strong>transacciones atómicas</strong>, garantizando la consistencia ante fallas o interrupciones.  </li>
+<li>Los <strong>valores enumerados</strong> (como estados, tipos o condiciones) deben implementarse con <strong>CHECK constraints</strong> o mediante <strong>tablas de referencia</strong>, según el motor de base de datos.  </li>
+<li>Los <strong>índices compuestos</strong> se recomiendan en campos utilizados frecuentemente para búsquedas o validaciones (ej. <code>(id_pais, nombre_ciudad)</code>, <code>(id_plan, id_bicicleta)</code>).</li>
+</ol>
+<hr>
+<h3 id="-conclusi-n">📘 Conclusión</h3>
+<p>El modelo lógico BICI-GO v4.0 consolida la estructura referencial y semántica del sistema,<br>integrando mecanismos de control, trazabilidad y consistencia de datos.<br>Su diseño soporta la expansión futura de servicios, coberturas y tipos de uso,<br>manteniendo la integridad relacional y las normas de calidad de datos exigidas en sistemas distribuidos.</p>
+<hr>
+<blockquote>
+<p><strong>Versión:</strong> 4.0<br><strong>Rol responsable:</strong> Diseñador Lógico<br><strong>Sistema:</strong> BICI-GO<br><strong>Actualización:</strong> Noviembre de 2025  </p>
+</blockquote>
+</body></html>
