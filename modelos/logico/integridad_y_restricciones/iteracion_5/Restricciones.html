@@ -1,0 +1,211 @@
+<html>
+<head>
+  <style>
+    body { color: black; font-family: Arial, sans-serif; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+<h1>INTEGRIDAD REFERENCIAL Y RESTRICCIONES SEMÁNTICAS</h1>
+<h2>Modelo Lógico BICI-GO v5.0 – Rol: Diseñador Lógico</h2>
+<hr>
+
+<h3>🧱 PARTE 1. UNICIDAD</h3>
+<table>
+<tr><th>Tabla</th><th>Campo(s)</th><th>Restricción</th><th>Prioridad</th><th>Descripción</th></tr>
+<tr><td>pais</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre de país único.</td></tr>
+<tr><td>ciudad</td><td>(nombre, id_pais)</td><td>UNIQUE</td><td>🟢</td><td>Nombre de ciudad único dentro de un país.</td></tr>
+<tr><td>punto_alquiler</td><td>nombre</td><td>UNIQUE</td><td>🟡</td><td>Nombre único de punto de alquiler.</td></tr>
+<tr><td>persona</td><td>(documento_tipo, documento_numero)</td><td>UNIQUE</td><td>🔴</td><td>Documento único por persona.</td></tr>
+<tr><td>cliente</td><td>usuario</td><td>UNIQUE</td><td>🔴</td><td>Usuario único en el sistema.</td></tr>
+<tr><td>bicicleta</td><td>codigo_unico</td><td>UNIQUE</td><td>🔴</td><td>Código único de bicicleta.</td></tr>
+<tr><td>metodo_de_pago</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre único de método de pago.</td></tr>
+<tr><td>servicio</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre único de servicio.</td></tr>
+<tr><td>etiqueta</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre único de etiqueta.</td></tr>
+</table>
+
+<hr>
+<h3>🔗 PARTE 2. INTEGRIDAD REFERENCIAL</h3>
+<table>
+<tr><th>Tabla origen</th><th>Campo FK</th><th>Tabla destino</th><th>Regla</th><th>Prioridad</th><th>Descripción</th></tr>
+<tr><td>ciudad</td><td>id_pais</td><td>pais</td><td>ON DELETE RESTRICT</td><td>🟢</td><td>Una ciudad requiere un país válido.</td></tr>
+<tr><td>punto_alquiler</td><td>id_ciudad</td><td>ciudad</td><td>ON DELETE CASCADE</td><td>🟡</td><td>Eliminar ciudad borra sus puntos.</td></tr>
+<tr><td>contacto_punto</td><td>id_persona</td><td>persona</td><td>ON DELETE CASCADE</td><td>🟡</td><td>Elimina contactos si la persona se borra.</td></tr>
+<tr><td>cliente</td><td>id_persona</td><td>persona</td><td>ON DELETE RESTRICT</td><td>🔴</td><td>Un cliente requiere persona asociada.</td></tr>
+<tr><td>reserva</td><td>id_cliente</td><td>cliente</td><td>ON DELETE RESTRICT</td><td>🔴</td><td>No se elimina cliente con reservas.</td></tr>
+<tr><td>reserva</td><td>id_metodo_de_pago</td><td>metodo_de_pago</td><td>ON DELETE SET NULL</td><td>🟡</td><td>Reserva puede quedar sin método si se elimina.</td></tr>
+<tr><td>detalle_alquiler</td><td>id_reserva</td><td>reserva</td><td>ON DELETE CASCADE</td><td>🟢</td><td>Eliminar reserva borra detalles.</td></tr>
+<tr><td>reserva_descuento</td><td>id_descuento</td><td>descuento</td><td>ON DELETE CASCADE</td><td>🟡</td><td>Eliminar descuento borra relación.</td></tr>
+<tr><td>cobertura_seguro</td><td>id_bicicleta</td><td>bicicleta</td><td>ON DELETE CASCADE</td><td>🔴</td><td>Eliminar bicicleta borra sus coberturas.</td></tr>
+<tr><td>detalle_dia_horario</td><td>id_punto_alquiler</td><td>punto_alquiler</td><td>ON DELETE CASCADE</td><td>🟢</td><td>Eliminar punto borra horarios.</td></tr>
+<tr><td>excepcion_horario</td><td>id_punto_alquiler</td><td>punto_alquiler</td><td>ON DELETE CASCADE</td><td>🟢</td><td>Eliminar punto borra excepciones.</td></tr>
+</table>
+
+<hr>
+<h3>⚙️ PARTE 3. INTEGRIDAD SEMÁNTICA GENERAL</h3>
+<table>
+<tr><th>Tabla</th><th>Campo(s)</th><th>Condición</th><th>Prioridad</th><th>Descripción</th></tr>
+<tr><td>cliente</td><td>contraseña</td><td>Formato seguro (hash)</td><td>🔴</td><td>Las contraseñas deben almacenarse cifradas.</td></tr>
+<tr><td>bicicleta</td><td>anio_fabricacion</td><td>&gt;= 1900 AND &lt;= año actual</td><td>🟢</td><td>Año válido de fabricación.</td></tr>
+<tr><td>punto_alquiler</td><td>fecha_fin</td><td>NULL o &gt; fecha_inicio</td><td>🟢</td><td>Coherencia temporal.</td></tr>
+<tr><td>detalle_dia_horario</td><td>id_dia_semana</td><td>IN (1–7)</td><td>🟢</td><td>Días válidos de la semana.</td></tr>
+<tr><td>descuento</td><td>valor</td><td>&gt; 0</td><td>🔴</td><td>El valor del descuento debe ser positivo.</td></tr>
+<tr><td>reserva</td><td>total_general</td><td>= subtotal_general - descuento_total + iva_total</td><td>🔴</td><td>Consistencia en cálculo de totales.</td></tr>
+<tr><td>fotografia</td><td>formato</td><td>IN (JPG, PNG, WEBP, GIF)</td><td>🟡</td><td>Formatos válidos de imagen.</td></tr>
+</table>
+<hr>
+<h3>🧮 PARTE 4. REGLAS DE NEGOCIO</h3>
+<table>
+  <tr><th>ID Regla</th><th>Nombre</th><th>Condición / Descripción</th><th>Impacto</th><th>Prioridad</th></tr>
+
+  <tr>
+    <td>RN-01</td>
+    <td>Disponibilidad de bicicleta</td>
+    <td>Solo se alquila si estado operativo vigente = 'disponible' y la bicicleta está asociada a un punto activo.</td>
+    <td>Control de flujo</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-02</td>
+    <td>Capacidad de punto</td>
+    <td>Registro de alquiler o devolución requiere que capacidad.espacios_disponibles &gt; 0 en el punto destino.</td>
+    <td>Prevención de saturación</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-03</td>
+    <td>Restricción por horario</td>
+    <td>Operaciones (inicio/fin de alquiler) deben ocurrir dentro de detalle_dia_horario para el punto. Excepciones válidas aplican.</td>
+    <td>Control operacional</td>
+    <td>🟡</td>
+  </tr>
+
+  <tr>
+    <td>RN-04</td>
+    <td>Mantenimiento preventivo</td>
+    <td>Si uso_acumulado (km_total u horas_total) supera umbrales de parametro_mantenimiento, la bicicleta cambia a estado operativo 'mantenimiento'.</td>
+    <td>Seguridad</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-05</td>
+    <td>Asignación de etiquetas</td>
+    <td>No se permiten duplicados de (id_bicicleta, id_etiqueta, fecha_asignacion). Una etiqueta puede tener fecha_eliminacion para desactivación.</td>
+    <td>Consistencia informativa</td>
+    <td>🟢</td>
+  </tr>
+
+  <tr>
+    <td>RN-06</td>
+    <td>Tarifa vigente única</td>
+    <td>Por combinación (id_plan, id_bicicleta) solo puede existir una tarifa con fecha_fin IS NULL.</td>
+    <td>Control de precios</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-07</td>
+    <td>Seguro activo por tipo</td>
+    <td>Para cada bicicleta y tipo de cobertura, solo una cobertura_seguro con estado = 'activo' y dentro de su vigencia.</td>
+    <td>Gestión de seguros</td>
+    <td>🟡</td>
+  </tr>
+
+  <tr>
+    <td>RN-08</td>
+    <td>Trazabilidad administrativa</td>
+    <td>Operaciones que cambian estado, tarifas, coberturas, ubicación o capacidad deben registrar id_admin válido.</td>
+    <td>Auditoría y control</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-09</td>
+    <td>No solapamiento de horarios</td>
+    <td>Las excepciones de horario no pueden solaparse entre sí ni con el horario base para la misma fecha/punto.</td>
+    <td>Coherencia temporal</td>
+    <td>🟢</td>
+  </tr>
+
+  <tr>
+    <td>RN-10</td>
+    <td>Sincronicidad de estados</td>
+    <td>Actualizaciones de estado_operativo deben revisar/actualizar estado_fisico correspondiente (ej. 'en revisión' al pasar a mantenimiento).</td>
+    <td>Gestión técnica</td>
+    <td>🟡</td>
+  </tr>
+</table>
+<hr>
+<h3>🔒 PARTE 5. SEGURIDAD LÓGICA</h3>
+<p>Estas restricciones definen los permisos y limitaciones según el rol de usuario dentro del sistema BICI-GO v5.0.</p>
+<table>
+<tr><th>Rol</th><th>Permisos principales</th><th>Restricciones</th><th>Observaciones</th></tr>
+
+<tr>
+<td><b>Administrador</b></td>
+<td>Insert, Update, Delete, Select</td>
+<td>Ninguna</td>
+<td>Control total sobre todas las entidades. Responsable de trazabilidad mediante <code>id_admin</code>.</td>
+</tr>
+
+<tr>
+<td><b>Operador</b></td>
+<td>Insert, Update, Select</td>
+<td>No puede eliminar registros críticos (bicicleta, plan, tarifa, cliente).</td>
+<td>Gestiona reservas, devoluciones y disponibilidad en puntos de alquiler.</td>
+</tr>
+
+<tr>
+<td><b>Cliente</b></td>
+<td>Select, Insert</td>
+<td>No puede modificar ni eliminar datos maestros.</td>
+<td>Solo puede iniciar reservas, consultar planes y registrar devoluciones.</td>
+</tr>
+
+<tr>
+<td><b>Técnico de mantenimiento</b></td>
+<td>Insert, Update</td>
+<td>No puede modificar datos de usuarios, reservas ni tarifas.</td>
+<td>Se limita a registrar mantenimientos y actualizar estados operativos/físicos de bicicletas.</td>
+</tr>
+
+<tr>
+<td><b>Auditor</b></td>
+<td>Select</td>
+<td>No puede modificar datos.</td>
+<td>Accede a vistas consolidadas para control de gestión y trazabilidad.</td>
+</tr>
+</table>
+
+<hr>
+<h3>🧾 PARTE 6. OBSERVACIONES FINALES</h3>
+<ol>
+<li>Todos los registros que incluyan <code>id_admin</code> deben mantener trazabilidad con el administrador responsable.</li>
+<li>Los campos de tipo <b>fecha</b> y <b>hora</b> siguen la convención UTC-5 (Bogotá) y valores por defecto del servidor.</li>
+<li>Los campos de auditoría (<code>fecha_creacion</code>, <code>fecha_actualizacion</code>, <code>fecha_inicio</code>, <code>fecha_fin</code>) son obligatorios en entidades históricas o de control.</li>
+<li>El sistema debe soportar <b>transacciones atómicas</b> para garantizar consistencia ante fallas.</li>
+<li>Los valores enumerados (estados, tipos, condiciones) deben implementarse con <b>CHECK constraints</b> o tablas de referencia.</li>
+<li>Se recomiendan <b>índices compuestos</b> en campos usados frecuentemente para búsquedas o validaciones (ej. <code>(id_pais, nombre_ciudad)</code>, <code>(id_plan, id_bicicleta)</code>).</li>
+<li>Las contraseñas de clientes y administradores deben almacenarse en formato seguro (hash + salt).</li>
+<li>Los registros de reservas deben validar consistencia de totales: <code>total_general = subtotal_general - descuento_total + iva_total</code>.</li>
+</ol>
+
+<hr>
+<h3>📘 Conclusión</h3>
+<p>El modelo lógico BICI-GO v5.0 consolida la estructura referencial, semántica y de seguridad del sistema,<br>
+integrando mecanismos de control, trazabilidad y consistencia de datos.<br>
+Su diseño soporta la expansión futura de servicios, coberturas, reservas y métodos de pago,<br>
+manteniendo la integridad relacional y las normas de calidad de datos exigidas en sistemas distribuidos.</p>
+
+<blockquote>
+<p><strong>Versión:</strong> 5.0<br>
+<strong>Rol responsable:</strong> Diseñador Lógico<br>
+<strong>Sistema:</strong> BICI-GO<br>
+<strong>Actualización:</strong> Noviembre de 2025</p>
+</blockquote>
+
