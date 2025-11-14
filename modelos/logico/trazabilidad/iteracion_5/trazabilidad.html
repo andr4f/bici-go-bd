@@ -1,0 +1,66 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Matriz de Trazabilidad - Sistema BICI-GO v5.0</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background:#f9f9f9; color:#222; }
+    h1, h2, h3 { color: #003366; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #999; padding: 8px; text-align: left; vertical-align: top; }
+    th { background-color: #cce5ff; color: #004085; }
+    tr:nth-child(even) { background-color: #e9f0fb; }
+    hr { border: 0; border-top: 2px solid #ccc; margin: 30px 0; }
+  </style>
+</head>
+<body>
+<h1>MATRIZ DE TRAZABILIDAD: MODELO CONCEPTUAL → MODELO LÓGICO</h1>
+<h2>Sistema BICI-GO v5.0 | Rol: Diseñador Lógico</h2>
+<hr>
+
+<h2>PARTE 1: TRAZABILIDAD DE ENTIDADES</h2>
+<table>
+<thead>
+<tr><th>#</th><th>Entidad Conceptual</th><th>Entidad(es) Lógica(s)</th><th>Transformación</th><th>Decisión y Justificación</th><th>Alternativas Consideradas</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><strong>pais</strong></td><td>pais</td><td>Directa 1:1</td><td>Catálogo maestro geográfico</td><td>N/A</td></tr>
+<tr><td>2</td><td><strong>ciudad</strong></td><td>ciudad</td><td>Directa 1:1</td><td>Catálogo con geolocalización</td><td>N/A</td></tr>
+<tr><td>3</td><td><strong>persona</strong></td><td>persona</td><td>Directa 1:1</td><td>Entidad base para clientes, administradores y contactos</td><td>Fusionar con cliente (rechazada)</td></tr>
+<tr><td>4</td><td><strong>cliente</strong></td><td>cliente</td><td>Directa 1:1</td><td>Separación clara de rol de usuario</td><td>Incluir en persona (rechazada)</td></tr>
+<tr><td>5</td><td><strong>administrador</strong></td><td>administrador</td><td>Directa 1:1</td><td>Tabla independiente para trazabilidad</td><td>Fusionar con persona (rechazada)</td></tr>
+<tr><td>6</td><td><strong>punto_alquiler</strong></td><td>punto_alquiler</td><td>Directa 1:1</td><td>Punto físico de alquiler</td><td>N/A</td></tr>
+<tr><td>7</td><td><strong>contacto_punto</strong></td><td>contacto_punto</td><td>Relación 1:N</td><td>Permite múltiples contactos asociados a un punto</td><td>Campos embebidos en punto (rechazada)</td></tr>
+<tr><td>8</td><td><strong>horario_base</strong></td><td>horario_base</td><td>Directa 1:1</td><td>Entidad de control de horarios</td><td>N/A</td></tr>
+<tr><td>9</td><td><strong>detalle_dia_horario</strong></td><td>detalle_dia_horario</td><td>Relación 1:N</td><td>Detalle por día de la semana</td><td>Campos repetidos en horario_base (rechazada)</td></tr>
+<tr><td>10</td><td><strong>excepcion_horario</strong></td><td>excepcion_horario</td><td>Relación 1:N</td><td>Excepciones de horarios</td><td>N/A</td></tr>
+<tr><td>11</td><td><strong>metodo_de_pago</strong></td><td>metodo_de_pago</td><td>Directa 1:1</td><td>Catálogo independiente</td><td>Campos embebidos en reserva (rechazada)</td></tr>
+<tr><td>12</td><td><strong>reserva</strong></td><td>reserva</td><td>Directa 1:1</td><td>Entidad transaccional principal</td><td>N/A</td></tr>
+<tr><td>13</td><td><strong>reserva_descuento</strong></td><td>reserva_descuento</td><td>Tabla intermedia</td><td>Relación M:N entre reserva y descuento</td><td>Descuento embebido en reserva (rechazada)</td></tr>
+<tr><td>14</td><td><strong>detalle_alquiler</strong></td><td>detalle_alquiler</td><td>Relación 1:N</td><td>Detalle de bicicletas y tarifas en cada reserva</td><td>N/A</td></tr>
+<tr><td>15</td><td><strong>plan</strong></td><td>plan</td><td>Directa 1:1</td><td>Catálogo de planes</td><td>N/A</td></tr>
+<tr><td>16</td><td><strong>tarifa</strong></td><td>tarifa</td><td>Tabla intermedia M:N</td><td>Relación entre plan y bicicleta con temporalidad</td><td>Tarifa solo en plan (rechazada)</td></tr>
+<tr><td>17</td><td><strong>servicio</strong></td><td>servicio</td><td>Directa 1:1</td><td>Catálogo de servicios</td><td>N/A</td></tr>
+<tr><td>18</td><td><strong>punto_servicio</strong></td><td>punto_servicio</td><td>Tabla intermedia M:N</td><td>Relación entre punto y servicio</td><td>Servicios embebidos en punto (rechazada)</td></tr>
+<tr><td>19</td><td><strong>cobertura_seguro</strong></td><td>cobertura_seguro</td><td>Directa 1:1</td><td>Tabla de seguros por bicicleta</td><td>N/A</td></tr>
+<tr><td>20</td><td><strong>tipo_cobertura</strong></td><td>tipo_cobertura</td><td>Directa 1:1</td><td>Catálogo de tipos de cobertura</td><td>N/A</td></tr>
+<tr><td>21</td><td><strong>condiciones_especiales</strong></td><td>condiciones_especiales</td><td>Directa 1:1</td><td>Tabla de restricciones físicas</td><td>N/A</td></tr>
+<tr><td>22</td><td><strong>uso_acumulado</strong></td><td>uso_acumulado</td><td>Relación 1:1</td><td>Tabla independiente para métricas acumuladas</td><td>Atributos en bicicleta (rechazada)</td></tr>
+<tr><td>23</td><td><strong>parametro_mantenimiento</strong></td><td>parametro_mantenimiento</td><td>Directa 1:1</td><td>Tabla de configuración de umbrales</td><td>N/A</td></tr>
+</tbody>
+</table>
+
+<hr>
+<h2>📘 Conclusión</h2>
+<p>
+La matriz de trazabilidad del modelo BICI-GO v5.0 asegura correspondencia clara entre entidades conceptuales y su representación lógica.<br>
+Se mantienen catálogos simples en 3FN, tablas históricas para estados y relaciones M:N normalizadas.<br>
+Las decisiones refuerzan la trazabilidad, la auditoría mediante <code>id_admin</code> y la coherencia temporal en reservas, horarios y coberturas.<br>
+Este diseño soporta la expansión futura de servicios, clientes, métodos de pago y gestión de descuentos,<br>
+manteniendo la integridad relacional y las normas de calidad de datos exigidas en sistemas distribuidos.
+</p>
+
+<blockquote>
+<p><strong>Versión:</strong> 5.0<br>
+<strong>Rol responsable:</strong> Diseñador Lógico<br>
+<strong>Sistema:</strong> BICI-GO<br>
+<strong>Actualización:</strong> Noviembre de 2025</p
