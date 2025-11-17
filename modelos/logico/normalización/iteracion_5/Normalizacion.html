@@ -1,0 +1,109 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Análisis de Normalización - Sistema BICI-GO v5.0</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background:#f9f9f9; color:#222; }
+    h1, h2, h3 { color: #003366; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #999; padding: 8px; text-align: left; vertical-align: top; }
+    th { background-color: #cce5ff; color: #004085; }
+    tr:nth-child(even) { background-color: #e9f0fb; }
+    hr { border: 0; border-top: 2px solid #ccc; margin: 30px 0; }
+  </style>
+</head>
+<body>
+<h1>ANÁLISIS DE NORMALIZACIÓN - FORMAS NORMALES</h1>
+<h2>Sistema BICI-GO v5.0 | Rol: Diseñador Lógico</h2>
+<hr>
+
+<h2>PARTE 1: DECISIONES DE NORMALIZACIÓN - 1FN</h2>
+<h3>Primera Forma Normal (1FN): Sin atributos multivaluados o compuestos</h3>
+<table>
+<thead><tr><th>Decisión</th><th>Tabla Afectada</th><th>Justificación</th><th>Alternativa Rechazada</th></tr></thead>
+<tbody>
+<tr><td>Separar resolución en ancho/alto</td><td>fotografia</td><td>Evita atributo compuesto “1920x1080”</td><td>Usar VARCHAR combinado</td></tr>
+<tr><td>Eliminar multivaluados</td><td>bicicleta_etiqueta</td><td>Relación M:N temporal</td><td>Uso de arrays o JSON</td></tr>
+<tr><td>Unidades explícitas</td><td>condiciones_especiales</td><td>Claridad con peso_maximo_kg y altura_minima_cm</td><td>Unidades en texto</td></tr>
+</tbody>
+</table>
+
+<hr>
+<h2>PARTE 2: DECISIONES DE NORMALIZACIÓN - 2FN</h2>
+<h3>Segunda Forma Normal (2FN): Sin dependencias parciales</h3>
+<table>
+<thead><tr><th>Decisión</th><th>Tabla Afectada</th><th>Justificación</th><th>Beneficio</th></tr></thead>
+<tbody>
+<tr><td>PK sustitutas y claves naturales</td><td>bicicleta</td><td>id_bicicleta como PK y codigo_unico como clave natural</td><td>Elimina dependencias parciales</td></tr>
+<tr><td>Separación de catálogos</td><td>tipo_uso, tipo_asistencia, tipo_cobertura</td><td>Evita redundancia</td><td>Claridad y reducción de duplicación</td></tr>
+<tr><td>Separar persona/cliente/administrador</td><td>persona, cliente, administrador</td><td>Evita dependencias parciales entre atributos</td><td>Mayor flexibilidad</td></tr>
+</tbody>
+</table>
+
+<hr>
+<h2>PARTE 3: DECISIONES DE NORMALIZACIÓN - 3FN</h2>
+<h3>Tercera Forma Normal (3FN): Sin dependencias transitivas</h3>
+<table>
+<thead><tr><th>Decisión</th><th>Tabla Afectada</th><th>Justificación</th><th>Eliminada</th></tr></thead>
+<tbody>
+<tr><td>Separar uso_acumulado</td><td>uso_acumulado</td><td>Evita transitivas con bicicleta</td><td>Dependencia bicicleta → métricas</td></tr>
+<tr><td>FK id_admin</td><td>Tablas transaccionales</td><td>Trazabilidad independiente</td><td>Dependencia transitiva con usuario</td></tr>
+<tr><td>Separar descuentos</td><td>descuento, reserva_descuento</td><td>Evita transitiva reserva → descuento</td><td>Dependencia transitiva</td></tr>
+</tbody>
+</table>
+
+<hr>
+<h2>PARTE 4: DECISIONES DE NORMALIZACIÓN - 4FN</h2>
+<h3>Cuarta Forma Normal (4FN): Sin dependencias multivaluadas no triviales</h3>
+<table>
+<thead><tr><th>Decisión</th><th>Tabla Afectada</th><th>Justificación</th><th>Beneficio</th></tr></thead>
+<tbody>
+<tr><td>Historial temporal</td><td>estado_operativo, estado_fisico</td><td>Evita redundancias</td><td>Escalable</td></tr>
+<tr><td>Relaciones M:N temporales</td><td>ubicacion, bicicleta_etiqueta</td><td>Gestión sin explosión cartesiana</td><td>Escalable</td></tr>
+<tr><td>Horarios</td><td>detalle_dia_horario, excepcion_horario</td><td>Evita multivaluados en horarios</td><td>Coherencia temporal</td></tr>
+</tbody>
+</table>
+
+<hr>
+<h2>PARTE 5: DECISIONES DE NORMALIZACIÓN - NUEVOS CAMBIOS</h2>
+<h3>Capacidad y Servicios</h3>
+<table>
+<thead><tr><th>Decisión</th><th>Tabla Afectada</th><th>Justificación</th><th>Alternativa Considerada</th></tr></thead>
+<tbody>
+<tr><td>Separar capacidad</td><td>capacidad, capacidad_tipo</td><td>Evita redundancia de atributos</td><td>Mantener campos redundantes</td></tr>
+<tr><td>Separar servicios</td><td>servicio, punto_servicio</td><td>Relación M:N normalizada</td><td>Servicios embebidos en punto</td></tr>
+<tr><td>Separar métodos de pago</td><td>metodo_de_pago</td><td>Catálogo independiente</td><td>Campos embebidos en reserva</td></tr>
+</tbody>
+</table>
+
+<hr>
+<h2>PARTE 6: MATRIZ DE NORMALIZACIÓN POR TABLA</h2>
+<table>
+<thead><tr><th>Tabla</th><th>1FN</th><th>2FN</th><th>3FN</th><th>4FN</th><th>Recomendada</th><th>Justificación</th></tr></thead>
+<tbody>
+<tr><td><strong>pais</strong></td><td>✅</td><td>✅</td><td>✅</td><td>N/A</td><td><strong>3FN</strong></td><td>Catálogo simple</td></tr>
+<tr><td><strong>ciudad</strong></td><td>✅</td><td>✅</td><td>✅</td><td>N/A</td><td><strong>3FN</strong></td><td>Catálogo con FK</td></tr>
+<tr><td><strong>punto_alquiler</strong></td><td>✅</td><td>✅</td><td>✅</td><td>N/A</td><td><strong>3FN</strong></td><td>Entidad transaccional</td></tr>
+<tr><td><strong>capacidad</strong></td><td>✅</td><td>✅</td><td>✅</td><td>N/A</td><td><strong>3FN</strong></td><td>Eliminación de redundancias</td></tr>
+<tr><td><strong>capacidad_tipo</strong></td><td>✅</td><td>✅</td><td>✅</td><td>N/A</td><td><strong>3FN</strong></td><td>Detalle con FK</td></tr>
+<tr><td><strong>reserva</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td><strong>4FN</strong></td><td>Separación de descuentos y detalle</td></tr>
+<tr><td><strong>detalle_alquiler</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td><strong>4FN</strong></td><td>Evita multivaluados</td></tr>
+</tbody>
+</table>
+<hr>
+<h2>📘 Conclusión</h2>
+<p>
+El modelo lógico BICI-GO v5.0 cumple con las formas normales hasta 4FN en las entidades críticas.<br>
+Se han eliminado redundancias, dependencias parciales y transitivas, garantizando la consistencia y claridad de los datos.<br>
+La separación de catálogos, el uso de claves sustitutas y la incorporación de tablas históricas permiten un modelo más escalable y flexible.<br>
+Además, las decisiones de normalización aseguran trazabilidad mediante <code>id_admin</code>, coherencia temporal en entidades de control y eliminación de atributos redundantes en capacidad y servicios.<br>
+Este diseño soporta la expansión futura de funcionalidades como reservas, descuentos, métodos de pago y gestión de horarios,<br>
+manteniendo la integridad relacional y las normas de calidad de datos exigidas en sistemas distribuidos.
+</p>
+
+<blockquote>
+<p><strong>Versión:</strong> 5.0<br>
+<strong>Rol responsable:</strong> Diseñador Lógico<br>
+<strong>Sistema:</strong> BICI-GO<br>
+<strong>Actualización:</strong> Noviembre de 2025</p>
+</blockquote>

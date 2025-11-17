@@ -1,4 +1,4 @@
--- Tabla: administrador
+ï»¿-- Tabla: administrador
 CREATE TABLE administrador (
     id_admin INT PRIMARY KEY IDENTITY(1,1),
     nombre VARCHAR(100) NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE ciudad (
         ON UPDATE NO ACTION
 );
 
--- Tabla: punto_alquiler (CORREGIDA según lógico IT4)
+-- Tabla: punto_alquiler (CORREGIDA segï¿½n lï¿½gico IT4)
 CREATE TABLE punto_alquiler (
     id_punto_alquiler INT PRIMARY KEY IDENTITY(1,1),
     nombre VARCHAR(100) NOT NULL UNIQUE,
@@ -178,7 +178,7 @@ CREATE TABLE estado_fisico (
     descripcion VARCHAR(255) NULL,
     
     CONSTRAINT chk_estado_fisico_valores CHECK (
-        nombre IN ('excelente', 'bueno', 'regular', 'requiere servicio', 'dañada')
+        nombre IN ('excelente', 'bueno', 'regular', 'requiere servicio', 'daï¿½ada')
     )
 );
 
@@ -188,7 +188,7 @@ CREATE TABLE tipo_uso (
     descripcion VARCHAR(255) NULL,
     
     CONSTRAINT chk_tipo_uso_valores CHECK (
-        nombre IN ('montaña', 'urbana', 'ruta', 'híbrida', 'BMX', 'carretera')
+        nombre IN ('montaï¿½a', 'urbana', 'ruta', 'hï¿½brida', 'BMX', 'carretera')
     ),
     CONSTRAINT chk_tipo_uso_nombre CHECK (LEN(nombre) > 0)
 
@@ -201,7 +201,7 @@ CREATE TABLE tipo_asistencia (
 
     
     CONSTRAINT chk_tipo_asistencia_valores CHECK (
-        nombre IN ('convencional', 'eléctrica')
+        nombre IN ('convencional', 'elï¿½ctrica')
     ),
     CONSTRAINT chk_tipo_asistencia_nombre CHECK (LEN(nombre) > 0)
 );
@@ -398,7 +398,7 @@ CREATE TABLE cobertura_seguro (
     
     CONSTRAINT chk_monto_maximo CHECK (monto_maximo IS NULL OR monto_maximo > 0),
     CONSTRAINT chk_estado_cobertura_prin CHECK (
-        estado IN ('activo', 'vencido', 'cancelado', 'suspendido', 'en trámite')
+        estado IN ('activo', 'vencido', 'cancelado', 'suspendido', 'en trï¿½mite')
     ),
   
     
@@ -420,7 +420,7 @@ CREATE TABLE condiciones_especiales (
     tipo_condicion VARCHAR(50) NOT NULL,  -- 'peso', 'altura', 'edad', 'experiencia', etc.
     valor_minimo DECIMAL(10,2) NULL,
     valor_maximo DECIMAL(10,2) NULL,
-    unidad_medida VARCHAR(20) NULL,  -- 'kg', 'cm', 'años', etc.
+    unidad_medida VARCHAR(20) NULL,  -- 'kg', 'cm', 'aï¿½os', etc.
     descripcion VARCHAR(500) NULL,
     fecha_creacion DATETIME NOT NULL DEFAULT GETDATE(),
    
@@ -483,7 +483,7 @@ CREATE TABLE etiqueta (
     
     CONSTRAINT chk_etiqueta_tipo CHECK (
         tipo_de_etiqueta IS NULL OR 
-        tipo_de_etiqueta IN ('característica', 'accesorio', 'accesibilidad', 'restricción', 'promoción', 'terreno')
+        tipo_de_etiqueta IN ('caracterï¿½stica', 'accesorio', 'accesibilidad', 'restricciï¿½n', 'promociï¿½n', 'terreno')
     ),
     CONSTRAINT chk_etiqueta_nombre_no_vacio CHECK (LEN(nombre) > 0)
 );
@@ -518,12 +518,12 @@ CREATE TABLE imagen_bicicleta (
     orden_visualizacion SMALLINT NOT NULL DEFAULT 1,
     fecha_carga DATETIME NOT NULL DEFAULT GETDATE(),
     
-    -- Validaciones básicas
+    -- Validaciones bï¿½sicas
     CONSTRAINT chk_url_imagen CHECK (url_imagen LIKE 'http://%' OR url_imagen LIKE 'https://%'),
     CONSTRAINT chk_formato CHECK (formato IN ('JPG', 'JPEG', 'PNG', 'WEBP', 'GIF', 'AVIF')),
-    CONSTRAINT chk_resolucion_ancho CHECK (resolucion_ancho >= 200 AND resolucion_ancho <= 8192),  -- ? Más flexible
+    CONSTRAINT chk_resolucion_ancho CHECK (resolucion_ancho >= 200 AND resolucion_ancho <= 8192),  -- ? Mï¿½s flexible
     CONSTRAINT chk_resolucion_alto CHECK (resolucion_alto >= 200 AND resolucion_alto <= 8192),
-    CONSTRAINT chk_tamano_kb CHECK (tamano_kb > 0 AND tamano_kb <= 15000),  -- ? 15MB máximo
+    CONSTRAINT chk_tamano_kb CHECK (tamano_kb > 0 AND tamano_kb <= 15000),  -- ? 15MB mï¿½ximo
     CONSTRAINT chk_orden_visualizacion CHECK (orden_visualizacion >= 1 AND orden_visualizacion <= 100),
     
     -- FK
