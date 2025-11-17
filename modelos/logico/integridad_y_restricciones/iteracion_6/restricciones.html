@@ -1,0 +1,258 @@
+<html>
+<head>
+  <style>
+    body { color: black; font-family: Arial, sans-serif; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+<h1>INTEGRIDAD REFERENCIAL Y RESTRICCIONES SEMÁNTICAS</h1>
+<h2>Modelo Lógico BICI-GO v6.0 – Rol: Diseñador Lógico</h2>
+<hr>
+
+<h3>🧱 PARTE 1. UNICIDAD</h3>
+<table>
+<tr><th>Tabla</th><th>Campo(s)</th><th>Restricción</th><th>Prioridad</th><th>Descripción</th></tr>
+<tr><td>pais</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre de país único.</td></tr>
+<tr><td>ciudad</td><td>(nombre, id_pais)</td><td>UNIQUE</td><td>🟢</td><td>Nombre de ciudad único dentro de un país.</td></tr>
+<tr><td>punto_alquiler</td><td>nombre</td><td>UNIQUE</td><td>🟡</td><td>Nombre único de punto de alquiler.</td></tr>
+<tr><td>persona</td><td>(documento_tipo, documento_numero)</td><td>UNIQUE</td><td>🔴</td><td>Documento único por persona.</td></tr>
+<tr><td>cliente</td><td>usuario</td><td>UNIQUE</td><td>🔴</td><td>Usuario único en el sistema.</td></tr>
+<tr><td>bicicleta</td><td>codigo_unico</td><td>UNIQUE</td><td>🔴</td><td>Código único de bicicleta.</td></tr>
+<tr><td>metodo_de_pago</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre único de método de pago.</td></tr>
+<tr><td>servicio</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre único de servicio.</td></tr>
+<tr><td>etiqueta</td><td>nombre</td><td>UNIQUE</td><td>🟢</td><td>Nombre único de etiqueta.</td></tr>
+<tr><td>ruta_turistica</td><td>nombre</td><td>UNIQUE</td><td>🟡</td><td>Nombre único de ruta turística.</td></tr>
+<tr><td>idioma</td><td>codigo_iso</td><td>UNIQUE</td><td>🟢</td><td>Código ISO 639-1 único.</td></tr>
+<tr><td>idioma</td><td>codigo_iso3</td><td>UNIQUE</td><td>🟢</td><td>Código ISO 639-2 único.</td></tr>
+<tr><td>guia_turistico</td><td>numero_licencia</td><td>UNIQUE</td><td>🔴</td><td>Licencia única por guía.</td></tr>
+</table>
+
+<hr>
+<h3>🔗 PARTE 2. INTEGRIDAD REFERENCIAL</h3>
+<table>
+<tr><th>Tabla origen</th><th>Campo FK</th><th>Tabla destino</th><th>Regla</th><th>Prioridad</th><th>Descripción</th></tr>
+<tr><td>persona</td><td>id_terminos_condiciones</td><td>terminos_condiciones</td><td>ON DELETE SET NULL</td><td>🟡</td><td>Permite que una persona quede sin versión activa si se elimina.</td></tr>
+<tr><td>guia_turistico</td><td>id_persona</td><td>persona</td><td>ON DELETE RESTRICT</td><td>🔴</td><td>Un guía requiere una persona asociada.</td></tr>
+<tr><td>guia_ruta</td><td>id_guia_turistico</td><td>guia_turistico</td><td>ON DELETE CASCADE</td><td>🟢</td><td>Eliminar guía borra sus asignaciones de ruta.</td></tr>
+<tr><td>guia_ruta</td><td>id_ruta</td><td>ruta_turistica</td><td>ON DELETE CASCADE</td><td>🟢</td><td>Eliminar ruta borra sus asignaciones.</td></tr>
+<tr><td>resenia_ruta</td><td>id_reserva</td><td>reserva</td><td>ON DELETE CASCADE</td><td>🟡</td><td>Eliminar reserva borra reseñas asociadas.</td></tr>
+<tr><td>resenia_ruta</td><td>id_ruta</td><td>ruta_turistica</td><td>ON DELETE CASCADE</td><td>🟡</td><td>Eliminar ruta borra reseñas.</td></tr>
+<tr><td>foto_resenia</td><td>id_resenia_ruta</td><td>resenia_ruta</td><td>ON DELETE CASCADE</td><td>🟢</td><td>Eliminar reseña borra sus fotos.</td></tr>
+<tr><td>guia_idioma</td><td>id_guia_turistico</td><td>guia_turistico</td><td>ON DELETE CASCADE</td><td>🟢</td><td>Eliminar guía borra sus idiomas.</td></tr>
+<tr><td>guia_idioma</td><td>id_idioma</td><td>idioma</td><td>ON DELETE RESTRICT</td><td>🟢</td><td>No se elimina idioma si está asignado.</td></tr>
+</table>
+
+<hr>
+<h3>⚙️ PARTE 3. INTEGRIDAD SEMÁNTICA GENERAL</h3>
+<table>
+<tr><th>Tabla</th><th>Campo(s)</th><th>Condición</th><th>Prioridad</th><th>Descripción</th></tr>
+<tr><td>terminos_condiciones</td><td>version</td><td>&gt;= 1</td><td>🟢</td><td>Versiones deben ser positivas.</td></tr>
+<tr><td>ruta_turistica</td><td>nivel_dificultad</td><td>IN (baja, media, alta)</td><td>🔴</td><td>Niveles válidos de dificultad.</td></tr>
+<tr><td>ruta_turistica</td><td>tipo_terreno</td><td>IN (urbano, rural, mixto)</td><td>🟡</td><td>Tipos válidos de terreno.</td></tr>
+<tr><td>idioma</td><td>codigo_iso</td><td>Patrón [a-z]{2}</td><td>🟢</td><td>Código ISO 639-1.</td></tr>
+<tr><td>idioma</td><td>codigo_iso3</td><td>Patrón [a-z]{3}</td><td>🟢</td><td>Código ISO 639-2.</td></tr>
+<tr><td>guia_ruta</td><td>veces_realizada</td><td>&gt;= 0</td><td>🟢</td><td>No puede ser negativo.</td></tr>
+<tr><td>resenia_ruta</td><td>calificacion</td><td>IN (1–5)</td><td>🔴</td><td>Escala de calificación válida.</td></tr>
+</table> 
+<hr>
+<h3>🧮 PARTE 4. REGLAS DE NEGOCIO</h3>
+<table>
+  <tr><th>ID Regla</th><th>Nombre</th><th>Condición / Descripción</th><th>Impacto</th><th>Prioridad</th></tr>
+
+  <tr>
+    <td>RN-01</td>
+    <td>Disponibilidad de bicicleta</td>
+    <td>Solo se alquila si estado operativo vigente = 'disponible' y la bicicleta está asociada a un punto activo.</td>
+    <td>Control de flujo</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-02</td>
+    <td>Capacidad de punto</td>
+    <td>Registro de alquiler o devolución requiere que capacidad.espacios_disponibles &gt; 0 en el punto destino.</td>
+    <td>Prevención de saturación</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-03</td>
+    <td>Restricción por horario</td>
+    <td>Operaciones (inicio/fin de alquiler) deben ocurrir dentro de detalle_dia_horario para el punto. Excepciones válidas aplican.</td>
+    <td>Control operacional</td>
+    <td>🟡</td>
+  </tr>
+
+  <tr>
+    <td>RN-04</td>
+    <td>Mantenimiento preventivo</td>
+    <td>Si uso_acumulado (km_total u horas_total) supera umbrales de parametro_mantenimiento, la bicicleta cambia a estado operativo 'mantenimiento'.</td>
+    <td>Seguridad</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-05</td>
+    <td>Asignación de etiquetas</td>
+    <td>No se permiten duplicados de (id_bicicleta, id_etiqueta, fecha_asignacion). Una etiqueta puede tener fecha_eliminacion para desactivación.</td>
+    <td>Consistencia informativa</td>
+    <td>🟢</td>
+  </tr>
+
+  <tr>
+    <td>RN-06</td>
+    <td>Tarifa vigente única</td>
+    <td>Por combinación (id_plan, id_bicicleta) solo puede existir una tarifa con fecha_fin IS NULL.</td>
+    <td>Control de precios</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-07</td>
+    <td>Seguro activo por tipo</td>
+    <td>Para cada bicicleta y tipo de cobertura, solo una cobertura_seguro con estado = 'activo' y dentro de su vigencia.</td>
+    <td>Gestión de seguros</td>
+    <td>🟡</td>
+  </tr>
+
+  <tr>
+    <td>RN-08</td>
+    <td>Trazabilidad administrativa</td>
+    <td>Operaciones que cambian estado, tarifas, coberturas, ubicación o capacidad deben registrar id_admin válido.</td>
+    <td>Auditoría y control</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-09</td>
+    <td>No solapamiento de horarios</td>
+    <td>Las excepciones de horario no pueden solaparse entre sí ni con el horario base para la misma fecha/punto.</td>
+    <td>Coherencia temporal</td>
+    <td>🟢</td>
+  </tr>
+
+  <tr>
+    <td>RN-10</td>
+    <td>Sincronicidad de estados</td>
+    <td>Actualizaciones de estado_operativo deben revisar/actualizar estado_fisico correspondiente (ej. 'en revisión' al pasar a mantenimiento).</td>
+    <td>Gestión técnica</td>
+    <td>🟡</td>
+  </tr>
+
+  <tr>
+    <td>RN-11</td>
+    <td>Aceptación de términos</td>
+    <td>Una persona no puede operar si no ha aceptado la versión actual de términos.</td>
+    <td>Legal y cumplimiento</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-12</td>
+    <td>Disponibilidad de guía</td>
+    <td>Un guía turístico solo puede ser asignado si esta_disponible = true y tiene al menos un idioma activo.</td>
+    <td>Gestión de rutas</td>
+    <td>🔴</td>
+  </tr>
+
+  <tr>
+    <td>RN-13</td>
+    <td>Validación de reseñas</td>
+    <td>Solo se puede registrar una reseña por combinación (id_reserva, id_ruta).</td>
+    <td>Control de duplicidad</td>
+    <td>🟡</td>
+  </tr>
+
+  <tr>
+    <td>RN-14</td>
+    <td>Idioma activo</td>
+    <td>Un idioma solo puede ser asignado si su estado = 'activo'.</td>
+    <td>Internacionalización</td>
+    <td>🟢</td>
+  </tr>
+
+  <tr>
+    <td>RN-15</td>
+    <td>Tarifa de guía</td>
+    <td>La tarifa base del guía debe ser mayor a cero y registrada antes de asignar rutas.</td>
+    <td>Control financiero</td>
+    <td>🔴</td>
+  </tr>
+</table>
+
+<hr>
+<h3>🔒 PARTE 5. SEGURIDAD LÓGICA</h3>
+<table>
+<tr><th>Rol</th><th>Permisos principales</th><th>Restricciones</th><th>Observaciones</th></tr>
+
+<tr>
+<td><b>Administrador</b></td>
+<td>Insert, Update, Delete, Select</td>
+<td>Ninguna</td>
+<td>Control total sobre todas las entidades. Responsable de trazabilidad mediante <code>id_admin</code>.</td>
+</tr>
+
+<tr>
+<td><b>Operador</b></td>
+<td>Insert, Update, Select</td>
+<td>No puede eliminar registros críticos (bicicleta, plan, tarifa, cliente).</td>
+<td>Gestiona reservas, devoluciones y disponibilidad en puntos de alquiler.</td>
+</tr>
+
+<tr>
+<td><b>Cliente</b></td>
+<td>Select, Insert</td>
+<td>No puede modificar ni eliminar datos maestros.</td>
+<td>Solo puede iniciar reservas, consultar planes y registrar devoluciones.</td>
+</tr>
+
+<tr>
+<td><b>Técnico de mantenimiento</b></td>
+<td>Insert, Update</td>
+<td>No puede modificar datos de usuarios, reservas ni tarifas.</td>
+<td>Se limita a registrar mantenimientos y actualizar estados operativos/físicos de bicicletas.</td>
+</tr>
+
+<tr>
+<td><b>Auditor</b></td>
+<td>Select</td>
+<td>No puede modificar datos.</td>
+<td>Accede a vistas consolidadas para control de gestión y trazabilidad.</td>
+</tr>
+
+<tr>
+<td><b>Guía turístico</b></td>
+<td>Select, Insert</td>
+<td>No puede modificar rutas ni reseñas ajenas.</td>
+<td>Registra disponibilidad, idiomas y acepta términos.</td>
+</tr>
+
+<tr>
+<td><b>Usuario turista</b></td>
+<td>Select, Insert</td>
+<td>No puede modificar rutas ni guías.</td>
+<td>Puede registrar reseñas y consultar rutas.</td>
+</tr>
+
+<tr>
+<td><b>Coordinador de rutas</b></td>
+<td>Insert, Update, Select</td>
+<td>No puede eliminar rutas ni guías.</td>
+<td>Asigna rutas, valida disponibilidad y gestiona reseñas.</td>
+</tr>
+</table>
+
+<hr>
+<h3>🧾 PARTE 6. OBSERVACIONES FINALES</h3>
+<ol>
+<li>Las entidades que incluyan <code>id_terminos_condiciones</code> deben validar vigencia y aceptación.</li>
+<li>Las rutas turísticas deben tener al menos un guía disponible para ser activadas.</li>
+<li>Las reseñas deben cumplir con formato, calificación válida y estar asociadas a reservas reales.</li>
+<li>Los idiomas deben seguir estándares ISO y estar activos para ser asignables.</li>
+<li>Las nuevas entidades mantienen coherencia temporal mediante campos como <code>fecha_asignacion</code>, <code>fecha_publicacion</code>, <code>fecha_creacion</code>.</li>
+<li>Se recomienda indexar combinaciones como <code>(id_guia_turistico, id_ruta)</code> y <code>(id_reserva, id_ruta)</code> para validaciones rápidas.</li>
+<li>Los roles nuevos deben respetar las restricciones de seguridad lógica y trazabilidad.</li>
+</ol>
